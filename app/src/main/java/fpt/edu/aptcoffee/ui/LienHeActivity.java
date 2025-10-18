@@ -36,9 +36,9 @@ public class LienHeActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
-        callAndSendEmail(tvLienHePhu, "0775098507", "phuhm@gmail.com");
-        callAndSendEmail(tvLienHeAn, "0359115805", "anthq@gmail.com");
-        callAndSendEmail(tvLienHeTin, "0364474090", "tinnv@gmail.com");
+        callAndSendEmail(tvLienHePhu, "0999999999", "codedoan1@gmail.com");
+        callAndSendEmail(tvLienHeAn, "03888888888", "codedoan2@gmail.com");
+        callAndSendEmail(tvLienHeTin, "0367777777", "codedoan3@gmail.com");
     }
 
     private void initView() {

@@ -57,7 +57,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/inter_regular"
-                        android:text="APT COFFEE"
+                        android:text=" COFFEE DVHO"
                         android:textColor="@color/BlackPrimary"
                         android:textSize="16sp"
                         tools:ignore="HardcodedText" />

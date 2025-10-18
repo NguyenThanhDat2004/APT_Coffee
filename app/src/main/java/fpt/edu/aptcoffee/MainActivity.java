@@ -10,9 +10,13 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.google.android.material.bottomnavigation.BottomNavigationItemView;
+// Xoá import không cần thiết
+// import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
+
+// Thêm import cho BadgeDrawable
+import com.google.android.material.badge.BadgeDrawable;
 
 import java.util.ArrayList;
 
@@ -21,12 +25,12 @@ import fpt.edu.aptcoffee.dao.ThongBaoDAO;
 import fpt.edu.aptcoffee.model.ThongBao;
 import fpt.edu.aptcoffee.ui.SignInActivity;
 
-
 public class MainActivity extends AppCompatActivity {
-    private String keyUser = ""; // Mã người dùng
+    private String keyUser = "";
     ViewPager2 vp2Main;
     BottomNavigationView bnvMain;
-    View iconNotification;
+    // Xoá biến View cũ, thay bằng BadgeDrawable
+    BadgeDrawable notificationBadge;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +39,8 @@ public class MainActivity extends AppCompatActivity {
         initView();
         initViewPager2Main();
         setKeyUser();
-        showIconNotification();
+        // Gọi hàm thiết lập badge mới
+        setupNotificationBadge();
 
         bnvMain.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @SuppressLint("NonConstantResourceId")
@@ -43,27 +48,23 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.menu_home:
-                        // Open fragment Home
                         vp2Main.setCurrentItem(0, false);
                         break;
                     case R.id.menu_search:
-                        // Open fragment Search
                         vp2Main.setCurrentItem(1, false);
                         break;
                     case R.id.menu_notification:
-                        // Open fragment Messenger
                         vp2Main.setCurrentItem(2, false);
                         break;
                     case R.id.menu_setting:
-                        // Open fragment Setting
                         vp2Main.setCurrentItem(3, false);
                         break;
                 }
+                // Khi chuyển tab, kiểm tra lại trạng thái thông báo
                 checkStatusNotification();
                 return true;
             }
         });
-
     }
 
     private void initView() {
@@ -73,37 +74,50 @@ public class MainActivity extends AppCompatActivity {
 
     private void initViewPager2Main() {
         ViewPagerMainAdapter adapter = new ViewPagerMainAdapter(this);
-
         vp2Main.setUserInputEnabled(false);
         vp2Main.setOffscreenPageLimit(3);
         vp2Main.setAdapter(adapter);
     }
 
-    @SuppressLint("InflateParams")
-    private void showIconNotification() {
-        // Show icon khi có thông báo có trạng thái chưa xem
-        BottomNavigationItemView itemView = bnvMain.findViewById(R.id.menu_notification);
-        iconNotification = getLayoutInflater().inflate(R.layout.layout_ic_thongbao, null);
-        checkStatusNotification();
+    // (Phương thức cũ showIconNotification() đã được xoá và thay thế bằng phương thức dưới đây)
+    /**
+     * Khởi tạo và thiết lập Badge cho mục thông báo.
+     * Đây là cách làm chính thống được Google khuyến khích.
+     */
+    private void setupNotificationBadge() {
+        // Lấy hoặc tạo một badge cho item menu có id là R.id.menu_notification
+        notificationBadge = bnvMain.getOrCreateBadge(R.id.menu_notification);
+        // Ban đầu, ẩn badge đi
+        notificationBadge.setVisible(false);
+        // Bạn có thể tuỳ chỉnh thêm cho badge nếu muốn, ví dụ:
+        // notificationBadge.setNumber(5);
+        // notificationBadge.setBackgroundColor(getColor(R.color.your_color));
 
-        // Thêm icon vào item Thông báo
-        itemView.addView(iconNotification);
+        // Kiểm tra trạng thái thông báo lần đầu
+        checkStatusNotification();
     }
 
+    /**
+     * Kiểm tra và cập nhật trạng thái hiển thị của badge.
+     */
     private void checkStatusNotification() {
+        if (notificationBadge == null) {
+            return; // Tránh lỗi nếu badge chưa được khởi tạo
+        }
         ThongBaoDAO thongBaoDAO = new ThongBaoDAO(this);
-        // Lấy tất cả Thông Báo có trạng thái chưa xem
         ArrayList<ThongBao> listNotification = thongBaoDAO.getByTrangThaiChuaXem();
 
-        if (listNotification.size() == 0) {
-            // Ẩn thông báo
-            iconNotification.setVisibility(View.GONE);
+        // SỬA LỖI: Sử dụng isEmpty() thay cho size() == 0
+        if (listNotification.isEmpty()) {
+            // Ẩn badge nếu không có thông báo mới
+            notificationBadge.setVisible(false);
         } else {
-            // Hiện thông báo
-            iconNotification.setVisibility(View.VISIBLE);
+            // Hiện badge nếu có thông báo mới
+            notificationBadge.setVisible(true);
+            // Nếu muốn hiện số lượng thông báo, dùng dòng dưới đây
+            // notificationBadge.setNumber(listNotification.size());
         }
     }
-
 
     private void setKeyUser() {
         Intent intent = this.getIntent();
@@ -116,14 +130,18 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        // Open fragment Home
-        vp2Main.setCurrentItem(0, false);
-        bnvMain.setSelectedItemId(R.id.menu_home);
+        if (vp2Main.getCurrentItem() == 0) {
+            super.onBackPressed();
+        } else {
+            vp2Main.setCurrentItem(0, false);
+            bnvMain.setSelectedItemId(R.id.menu_home);
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        // Cập nhật lại trạng thái thông báo mỗi khi quay lại MainActivity
         checkStatusNotification();
     }
 }

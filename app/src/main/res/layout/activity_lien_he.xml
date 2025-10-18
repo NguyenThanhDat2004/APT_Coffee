@@ -195,7 +195,7 @@
                             android:drawableStart="@drawable/ic_phone_line"
                             android:drawablePadding="10dp"
                             android:fontFamily="@font/inter_regular"
-                            android:text="0359115805"
+                            android:text="0359118885"
                             android:textColor="@color/BlackPrimary"
                             android:textSize="14sp"
                             tools:ignore="HardcodedText,UseCompatTextViewDrawableXml" />
